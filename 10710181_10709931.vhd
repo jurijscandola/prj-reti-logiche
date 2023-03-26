@@ -52,7 +52,7 @@ entity project_reti_logiche is
 end project_reti_logiche;
 
 architecture behavioral of project_reti_logiche is
-    TYPE state_type IS (IDLE, HEADER_1, HEADER_2, GET_ADDR, WAIT_RAM, GET_DATA, WRITE_OUT, DONE);
+    TYPE state_type IS (IDLE, HEADER, GET_ADDR, WAIT_RAM, GET_DATA, WAIT_DATA,WRITE_OUT, DONE);
     SIGNAL state_curr, state_next : state_type;
     SIGNAL selected_out, selected_out_next : STD_LOGIC_VECTOR(1 DOWNTO 0) := "00";
     SIGNAL o_mem_addr_next: STD_LOGIC_VECTOR(15 DOWNTO 0) := "0000000000000000";
@@ -74,6 +74,7 @@ BEGIN
             o_z2 <= "00000000";
             o_z3 <= "00000000";
             o_done <= '0';
+            mem_reg <= "0000000000000000";
             o_z0_reg <= "00000000";
             o_z1_reg <= "00000000";
             o_z2_reg <= "00000000";
@@ -93,13 +94,14 @@ BEGIN
             o_z1_reg <= z1_reg;
             o_z2_reg <= z2_reg;
             o_z3_reg <= z3_reg;
-
+            o_mem_we <= mem_we_next;
+            o_mem_en <= mem_en_next;
         END IF;
     END PROCESS;
 
-    PROCESS(state_curr, i_start, i_w, mem_reg, i_mem_data, z0_reg, z1_reg, z2_reg, z3_reg, o_z0_reg, o_z1_reg, o_z2_reg, o_z3_reg, selected_out_next, selected_out)
+    PROCESS(state_curr, i_start, i_w, mem_reg, i_mem_data, z0_reg, z1_reg, z2_reg, z3_reg, o_z0_reg, o_z1_reg, o_z2_reg, o_z3_reg, selected_out_next, selected_out, mem_en_next, mem_we_next)
         BEGIN
-        mem_reg_next <= "0000000000000000";
+        mem_reg_next <= mem_reg;
         o_mem_addr_next <= "0000000000000000";
         selected_out_next <= selected_out;
         o_done_next <= '0';
@@ -111,39 +113,38 @@ BEGIN
         z1_reg <= o_z1_reg;
         z2_reg <= o_z2_reg;
         z3_reg <= o_z3_reg;
-        o_mem_we <= '0';
-        o_mem_en <= '0';
+        mem_we_next <= '0';
+        mem_en_next <= '0';
         state_next <= state_curr;
 
         CASE state_curr IS
             WHEN IDLE =>
                 IF (i_start = '1') THEN
                     selected_out_next(1) <= i_w;
-                    state_next <= HEADER_2;
+                    state_next <= HEADER;
                 END IF;
 
-            WHEN HEADER_1 =>
-                state_next <= HEADER_2;
-
-            WHEN HEADER_2 =>
+            WHEN HEADER =>
                 selected_out_next(0) <= i_w;
                 state_next <= GET_ADDR;
 
             WHEN GET_ADDR =>
                 IF (i_start = '0') THEN
                     o_mem_addr_next <= mem_reg;
-                    o_mem_en <= '1';
+                    mem_en_next <= '1';
                     state_next <= WAIT_RAM;
                 ELSE
                     mem_reg_next <= mem_reg(14 DOWNTO 0) & i_w;
                 END IF;
 
             WHEN WAIT_RAM =>
-                o_mem_en <= '1';
+                o_mem_addr_next <= mem_reg;
+                mem_en_next <= '1';
                 state_next <= GET_DATA;
 
             WHEN GET_DATA =>
-                o_mem_en <= '1';
+                o_mem_addr_next <= mem_reg;
+                mem_en_next <= '1';
                 CASE selected_out IS
                     WHEN "00" =>
                         z0_reg <= i_mem_data;
@@ -155,11 +156,18 @@ BEGIN
                         z3_reg <= i_mem_data;
                     WHEN others => null;
                 END CASE;
+                state_next <= WAIT_DATA;
+
+            WHEN WAIT_DATA =>
+                o_mem_addr_next <= mem_reg;
+                mem_en_next <= '1';
                 state_next <= WRITE_OUT;
 
             WHEN WRITE_OUT =>
-                o_mem_en <= '0';
+                mem_en_next <= '0';
                 o_done_next <= '1';
+                mem_reg_next <= "0000000000000000";
+                o_mem_addr_next <= mem_reg;
                 o_z0_next <= o_z0_reg;
                 o_z1_next <= o_z1_reg;
                 o_z2_next <= o_z2_reg;
