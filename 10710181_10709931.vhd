@@ -1,21 +1,7 @@
 ----------------------------------------------------------------------------------
--- Company:
 -- Engineer: Daniel Shala, Jurij Scandola
 --
--- Create Date: 21.02.2023 22:24:23
--- Design Name:
--- Module Name: project_reti_logiche - prl0
--- Project Name:
--- Target Devices:
--- Tool Versions:
--- Description:
---
--- Dependencies:
---
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
---
+-- Module Name: project_reti_logiche
 ----------------------------------------------------------------------------------
 
 
@@ -57,10 +43,10 @@ architecture behavioral of project_reti_logiche is
     SIGNAL selected_out, selected_out_next : STD_LOGIC_VECTOR(1 DOWNTO 0) := "00";
     SIGNAL o_mem_addr_next: STD_LOGIC_VECTOR(15 DOWNTO 0) := "0000000000000000";
     SIGNAL mem_reg, mem_reg_next: STD_LOGIC_VECTOR(15 DOWNTO 0) := "0000000000000000";
-    SIGNAL o_z0_next, o_z0_reg, z0_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
-    SIGNAL o_z1_next, o_z1_reg, z1_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
-    SIGNAL o_z2_next, o_z2_reg, z2_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
-    SIGNAL o_z3_next, o_z3_reg, z3_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
+    SIGNAL o_z0_next, sav_z0_reg, z0_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
+    SIGNAL o_z1_next, sav_z1_reg, z1_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
+    SIGNAL o_z2_next, sav_z2_reg, z2_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
+    SIGNAL o_z3_next, sav_z3_reg, z3_reg : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
     SIGNAL mem_en_next, mem_we_next : STD_LOGIC := '0';
     SIGNAL o_done_next : STD_LOGIC := '0';
 
@@ -75,10 +61,10 @@ BEGIN
             o_z3 <= "00000000";
             o_done <= '0';
             mem_reg <= "0000000000000000";
-            o_z0_reg <= "00000000";
-            o_z1_reg <= "00000000";
-            o_z2_reg <= "00000000";
-            o_z3_reg <= "00000000";
+            sav_z0_reg <= "00000000";
+            sav_z1_reg <= "00000000";
+            sav_z2_reg <= "00000000";
+            sav_z3_reg <= "00000000";
 
         ELSIF (rising_edge(i_clk)) THEN
             state_curr <= state_next;
@@ -90,16 +76,16 @@ BEGIN
             o_z1 <= o_z1_next;
             o_z2 <= o_z2_next;
             o_z3 <= o_z3_next;
-            o_z0_reg <= z0_reg;
-            o_z1_reg <= z1_reg;
-            o_z2_reg <= z2_reg;
-            o_z3_reg <= z3_reg;
+            sav_z0_reg <= z0_reg;
+            sav_z1_reg <= z1_reg;
+            sav_z2_reg <= z2_reg;
+            sav_z3_reg <= z3_reg;
             o_mem_we <= mem_we_next;
             o_mem_en <= mem_en_next;
         END IF;
     END PROCESS;
 
-    PROCESS(state_curr, i_start, i_w, mem_reg, i_mem_data, z0_reg, z1_reg, z2_reg, z3_reg, o_z0_reg, o_z1_reg, o_z2_reg, o_z3_reg, selected_out_next, selected_out, mem_en_next, mem_we_next)
+    PROCESS(state_curr, i_start, i_w, mem_reg, mem_reg_next, i_mem_data, z0_reg, z1_reg, z2_reg, z3_reg, sav_z0_reg, sav_z1_reg, sav_z2_reg, sav_z3_reg, selected_out_next, selected_out, mem_en_next, mem_we_next)
         BEGIN
         mem_reg_next <= mem_reg;
         o_mem_addr_next <= "0000000000000000";
@@ -109,10 +95,10 @@ BEGIN
         o_z1_next <= "00000000";
         o_z2_next <= "00000000";
         o_z3_next <= "00000000";
-        z0_reg <= o_z0_reg;
-        z1_reg <= o_z1_reg;
-        z2_reg <= o_z2_reg;
-        z3_reg <= o_z3_reg;
+        z0_reg <= sav_z0_reg;
+        z1_reg <= sav_z1_reg;
+        z2_reg <= sav_z2_reg;
+        z3_reg <= sav_z3_reg;
         mem_we_next <= '0';
         mem_en_next <= '0';
         state_next <= state_curr;
@@ -168,10 +154,10 @@ BEGIN
                 o_done_next <= '1';
                 mem_reg_next <= "0000000000000000";
                 o_mem_addr_next <= mem_reg;
-                o_z0_next <= o_z0_reg;
-                o_z1_next <= o_z1_reg;
-                o_z2_next <= o_z2_reg;
-                o_z3_next <= o_z3_reg;
+                o_z0_next <= sav_z0_reg;
+                o_z1_next <= sav_z1_reg;
+                o_z2_next <= sav_z2_reg;
+                o_z3_next <= sav_z3_reg;
                 state_next <= DONE;
 
             WHEN DONE =>
