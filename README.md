@@ -7,7 +7,7 @@
 **Authors**:  
 - Daniel Shala – ID: 10710181  
 - Jurij Diego Scandola – ID: 10709931  
-**Final Grade**: 28/30 (in pairs)
+**Final Grade**: 30/30 (in pairs)
 
 ---
 
