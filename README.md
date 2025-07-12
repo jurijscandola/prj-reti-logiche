@@ -1,5 +1,5 @@
 
-# 📘 Project Summary: Final Project for Digital Logic Design
+# Project Summary: Final Project for Digital Logic Design
 
 **Course**: Digital Logic Design  
 **Academic Year**: 2022/2023  
@@ -11,13 +11,13 @@
 
 ---
 
-## 🎯 Objective
+## Objective 🎯 
 
 The goal of this project is to implement a **hardware component in VHDL** capable of interfacing with memory and routing a data signal through a multiplexer to one of four output channels based on an input command.
 
 ---
 
-## ⚙️ Component Functionality
+## Component Functionality
 
 - The system receives a serial input signal `i_w`, with the first 2 bits selecting the output channel (`Z0`–`Z3`), and the remaining bits (up to 16) indicating the **memory address**.
 - The input is only considered valid when `i_start = 1`, and this condition lasts between 2 and 18 clock cycles.
@@ -25,7 +25,7 @@ The goal of this project is to implement a **hardware component in VHDL** capabl
 
 ---
 
-## 🔌 Interface
+## Interface
 
 | Signal       | Direction | Description                                 |
 |--------------|-----------|---------------------------------------------|
@@ -42,7 +42,7 @@ The goal of this project is to implement a **hardware component in VHDL** capabl
 
 ---
 
-## 🧠 FSM Design
+## FSM Design
 
 The component is implemented as a **Finite State Machine (FSM)** with 8 states:
 
@@ -57,7 +57,7 @@ The component is implemented as a **Finite State Machine (FSM)** with 8 states:
 
 ---
 
-## ✅ Testing & Results
+## Testing & Results ✅ 
 
 Tests included edge cases and functional coverage:
 
@@ -70,7 +70,7 @@ Simulation passed in **Behavioral**, **Post-Synthesis Functional**, and **Timing
 
 ---
 
-## 🚀 Optimizations
+## Optimizations
 
 - FSM-based logic replaced initial counter-based design for better accuracy.
 - Temporary states (e.g., `WAIT_DATA`) added to ensure timing correctness.
